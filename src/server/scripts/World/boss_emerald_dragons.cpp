@@ -151,6 +151,8 @@ struct emerald_dragonAI : public WorldBossAI
 
     void JustSummoned(Creature* summon) override
     {
+        WorldBossAI::JustSummoned(summon);
+
         if (summon->GetEntry() == NPC_DREAM_FOG)
         {
             summon->AI()->SetGUID(me->GetGUID(), GUID_DRAGON);
@@ -685,11 +687,11 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!me->IsInCombat())
-                return;
-
             if (_banished)
             {
+                if (!UpdateVictim())
+                    return;
+
                 // If all three shades are dead, OR it has taken too long, end the current event and get Taerar back into business
                 if (_banishedTimer <= diff || !_shades)
                 {

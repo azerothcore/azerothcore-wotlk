@@ -2759,6 +2759,9 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
     if (!dist)
         return true;
 
+    if (isWorldBoss())
+        dist = std::max<float>(dist, std::min<float>(GetMap()->GetVisibilityRange(), SIZE_OF_GRID_CELL * 2) + GetCombatReach() + victim->GetCombatReach());
+
     float x, y, z;
     x = y = z = 0.0f;
     MovementGenerator* idleSlot = GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE);
