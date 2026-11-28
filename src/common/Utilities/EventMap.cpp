@@ -147,9 +147,9 @@ void EventMap::DelayEventsToMax(Milliseconds delay, GroupIndex group)
     {
         if (itr->first < _time + delay && (!group || (itr->second._groupMask & GroupMask(1u << (group - 1u)))))
         {
-            ScheduleEvent(itr->second._id, delay, group);
-            _eventMap.erase(itr);
-            itr = _eventMap.begin();
+            // Move the event to the new time; keep its own group and phase.
+            _eventMap.emplace(_time + delay, itr->second);
+            itr = _eventMap.erase(itr);
             continue;
         }
 
