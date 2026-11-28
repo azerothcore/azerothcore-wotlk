@@ -677,13 +677,19 @@ struct npc_cosmetic_toy_plane : public ScriptedAI
     {
         Movement::MoveSplineInit init(me);
         init.MovebyPath(_movementArray);
+        // A flying cycle is entered through one vertex, dropped after the first lap, so every later lap keeps all the
+        // waypoints below.
+        init.Path().insert(init.Path().begin(),
+            G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
         init.SetFly();
         init.SetCyclic();
         // one full loop is 10.76 seconds (sniffed value)
         // loop diameter is approx. 9.225f (calculated from waypoints below)
         // with a circumference of approx. 28.98f
         // this results in flying speed of approx. 2.7f
-        init.SetVelocity(2.7f);
+        // the spline also carries the plane from its spawn into the loop, and later laps keep that first lap's
+        // duration, so the velocity covers that leg too
+        init.SetVelocity(3.07f);
         init.Launch();
 
         scheduler.Schedule(420ms, [this](TaskContext context)
@@ -702,9 +708,7 @@ struct npc_cosmetic_toy_plane : public ScriptedAI
 
 private:
     Movement::PointsArray const _movementArray = {
-        // cyclic movementspine unfortunately includes spawn into loop
-        // which results in an imperfect loop right now
-        // CO1 SPAWN(5809.888,  683.5779,  653.6859)
+        // the spawn point (5809.888, 683.5779, 653.6859) only leads into this loop, which is what the plane flies
         G3D::Vector3(5813.709,  682.51855, 653.6033),
         G3D::Vector3(5816.815,  684.8459,  653.5755),
         G3D::Vector3(5817.1997, 688.83527, 653.631),
