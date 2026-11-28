@@ -718,7 +718,7 @@ private:
 
 struct boss_sartharion_dragonAI : public BossAI
 {
-    boss_sartharion_dragonAI(Creature* creature, uint32 bossId) : BossAI(creature, bossId), isCalledBySartharion(false) { }
+    boss_sartharion_dragonAI(Creature* creature, uint32 bossId) : BossAI(creature, bossId), isCalledBySartharion(false), _startLandingDescent(false) { }
 
     void Reset() override
     {
@@ -734,6 +734,7 @@ struct boss_sartharion_dragonAI : public BossAI
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         portalGUID.Clear();
         isCalledBySartharion = false;
+        _startLandingDescent = false;
         instance->DoAction(ACTION_CLEAR_PORTAL);
     }
 
@@ -768,9 +769,9 @@ struct boss_sartharion_dragonAI : public BossAI
         {
             case POINT_LANDING_APPROACH:
             {
-                // 1.0 yd straight down; the anim-tier hint is what plays the fly-to-ground animation.
-                me->GetMotionMaster()->MovePoint(POINT_LANDING, GetDragonLandingPos(me->GetEntry()),
-                    FORCED_MOVEMENT_NONE, TRANSITION_SPEED, false, true, AnimTier::Ground);
+                // Queued for UpdateAI: a move started here is reset by MotionMaster::DirectExpire as soon as this
+                // finalize returns, and that reset stops the spline it just launched, the same way as npc_sorlof.
+                _startLandingDescent = true;
                 break;
             }
             case POINT_LANDING:
@@ -930,6 +931,15 @@ struct boss_sartharion_dragonAI : public BossAI
 
     void UpdateAI(uint32 diff) final
     {
+        if (_startLandingDescent)
+        {
+            _startLandingDescent = false;
+
+            // 1.0 yd straight down; the anim-tier hint is what plays the fly-to-ground animation.
+            me->GetMotionMaster()->MovePoint(POINT_LANDING, GetDragonLandingPos(me->GetEntry()),
+                FORCED_MOVEMENT_NONE, TRANSITION_SPEED, false, true, AnimTier::Ground);
+        }
+
         extraEvents.Update(diff);
         while (uint32 const eventId = extraEvents.ExecuteEvent())
         {
@@ -1021,6 +1031,7 @@ protected:
     EventMap extraEvents;
     ObjectGuid portalGUID;
     bool isCalledBySartharion;
+    bool _startLandingDescent;
 };
 
 /////////////////////////////
