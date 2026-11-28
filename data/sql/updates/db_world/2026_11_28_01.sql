@@ -1,3 +1,4 @@
+-- DB update 2026_11_28_00 -> 2026_11_28_01
 --
 -- Razorscale: unit_flags 0x8200 (UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_SWIMMING) for the five interactive Expedition
 -- NPCs, and Flame Breath's conditions so the breath can reach the Expedition Trappers and Defenders
