@@ -17,6 +17,7 @@
 
 #include "DBCStores.h"
 #include "BattlegroundMgr.h"
+#include "ClassMgr.h"
 #include "DBCFileLoader.h"
 #include "DBCfmt.h"
 #include "Errors.h"
@@ -26,7 +27,9 @@
 #include "SpellMgr.h"
 #include "TransportMgr.h"
 #include "World.h"
+#include <array>
 #include <map>
+#include <vector>
 
 typedef std::tuple<int16, int8, int32> WMOAreaTableKey;
 typedef std::map<WMOAreaTableKey, WMOAreaTableEntry const*> WMOAreaInfoByTripple;
@@ -174,7 +177,7 @@ std::unordered_set<uint32> sPetTalentSpells;
 DBCStorage <TalentTabEntry> sTalentTabStore(TalentTabEntryfmt);
 
 // store absolute bit position for first rank for talent inspect
-static uint32 sTalentTabPages[MAX_CLASSES][3];
+static std::vector<std::array<uint32, MAX_TALENT_TABS>> sTalentTabPages;
 
 DBCStorage <TaxiNodesEntry> sTaxiNodesStore(TaxiNodesEntryfmt);
 TaxiMask sTaxiNodesMask;
@@ -522,26 +525,6 @@ void LoadDBCStores(std::string const& dataPath)
         }
     }
 
-    // prepare fast data access to bit pos of talent ranks for use at inspecting
-    {
-        // now have all max ranks (and then bit amount used for store talent ranks in inspect)
-        for (uint32 talentTabId = 1; talentTabId < sTalentTabStore.GetNumRows(); ++talentTabId)
-        {
-            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentTabId);
-            if (!talentTabInfo)
-                continue;
-
-            // prevent memory corruption; otherwise cls will become 12 below
-            if ((talentTabInfo->ClassMask & CLASSMASK_ALL_PLAYABLE) == 0)
-                continue;
-
-            // store class talent tab pages
-            for (uint32 cls = 1; cls < MAX_CLASSES; ++cls)
-                if (talentTabInfo->ClassMask & (1 << (cls - 1)))
-                    sTalentTabPages[cls][talentTabInfo->tabpage] = talentTabId;
-        }
-    }
-
     for (uint32 i = 1; i < sTaxiPathStore.GetNumRows(); ++i)
         if (TaxiPathEntry const* entry = sTaxiPathStore.LookupEntry(i))
             sTaxiPathSetBySource[entry->from][entry->to] = entry;
@@ -838,9 +821,37 @@ PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundB
     return nullptr;
 }
 
+void BuildTalentTabPages()
+{
+    // sized from ClassMgr, so it must run after ClassMgr::LoadClasses()
+    sTalentTabPages.assign(sClassMgr->GetMaxClasses(), std::array<uint32, MAX_TALENT_TABS>{});
+
+    for (uint32 talentTabId = 1; talentTabId < sTalentTabStore.GetNumRows(); ++talentTabId)
+    {
+        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentTabId);
+        if (!talentTabInfo)
+            continue;
+
+        if ((talentTabInfo->ClassMask & sClassMgr->GetPlayableClassMask()) == 0)
+            continue;
+
+        // prevent memory corruption: a tab page is an index into the 3 tabs of a class
+        if (talentTabInfo->tabpage >= MAX_TALENT_TABS)
+            continue;
+
+        // store class talent tab pages
+        for (uint32 cls = 1; cls < sTalentTabPages.size(); ++cls)
+            if (talentTabInfo->ClassMask & (uint32(1) << (cls - 1)))
+                sTalentTabPages[cls][talentTabInfo->tabpage] = talentTabId;
+    }
+}
+
 uint32 const* GetTalentTabPages(uint8 cls)
 {
-    return sTalentTabPages[cls];
+    if (cls >= sTalentTabPages.size())
+        return nullptr;
+
+    return sTalentTabPages[cls].data();
 }
 
 bool IsSharedDifficultyMap(uint32 mapid)
