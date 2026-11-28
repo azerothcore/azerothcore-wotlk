@@ -731,7 +731,7 @@ Spell::Spell(WorldObject* caster, SpellInfo const* info, TriggerCastFlags trigge
     // xinef:
     _spellTargetsSelected = false;
 
-    m_weaponItem = nullptr;
+    m_weaponItemGUID.Clear();
 }
 
 Spell::~Spell()
@@ -8102,7 +8102,8 @@ SpellCastResult Spell::CheckItems(uint32* param1, uint32* param2)
                 return SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND;
         }
 
-        m_weaponItem = unitCaster->ToPlayer()->GetWeaponForAttack(m_attackType, true);
+        Item* weaponItem = unitCaster->ToPlayer()->GetWeaponForAttack(m_attackType, true);
+        m_weaponItemGUID = weaponItem ? weaponItem->GetGUID() : ObjectGuid::Empty;
     }
 
     return SPELL_CAST_OK;
