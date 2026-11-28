@@ -16,13 +16,44 @@
  */
 
 #include "Config.h"
+#include "DBCFileLoader.h"
 #include "MapBuilder.h"
 #include "PathCommon.h"
 #include "Timer.h"
 #include "Util.h"
 #include <boost/filesystem.hpp>
+#include <unordered_map>
 
 using namespace MMAP;
+
+namespace
+{
+    std::unordered_map<uint32, uint8> _liquidTypes;
+}
+
+uint32 GetLiquidFlags(uint32 liquidId)
+{
+    auto itr = _liquidTypes.find(liquidId);
+    return itr != _liquidTypes.end() ? (1 << itr->second) : 0;
+}
+
+std::unordered_map<uint32, uint8> LoadLiquid(std::string const& dataDirPath)
+{
+    DBCFileLoader liquidDbc;
+    std::unordered_map<uint32, uint8> liquidData;
+    std::string const dbcPath = (std::filesystem::path(dataDirPath) / "dbc" / "LiquidType.dbc").string();
+    // format string only needs the right length here; worldserver uses it to map fields to structures
+    if (liquidDbc.Load(dbcPath.c_str(), "nxxixixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"))
+    {
+        for (uint32 x = 0; x < liquidDbc.GetNumRows(); ++x)
+        {
+            DBCFileLoader::Record record = liquidDbc.getRecord(x);
+            liquidData[record.getUInt(0)] = record.getUInt(3);
+        }
+    }
+
+    return liquidData;
+}
 
 bool checkDirectories(std::string const& dataDirPath, bool debugOutput)
 {
@@ -191,6 +222,10 @@ int main(int argc, char** argv)
 
     if (!checkDirectories(config->DataDirPath(), config->IsDebugOutputEnabled()))
         return silent ? -3 : finish("Press ENTER to close...", -3);
+
+    _liquidTypes = LoadLiquid(config->DataDirPath());
+    if (_liquidTypes.empty())
+        return silent ? -4 : finish("Failed to load LiquidType.dbc", -4);
 
     MapBuilder builder(&config.value(), mapnum, threads);
 
