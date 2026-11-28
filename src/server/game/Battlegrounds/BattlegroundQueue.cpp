@@ -317,9 +317,11 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
 
             // re-enqueue BG if free slots reopened due to invite expiration
             if (bg->HasFreeSlots())
-            {
                 bg->AddToBGFreeSlotQueue();
 
+            // even without free slots: waiters this BG was holding got no update when it started or ended
+            if (bg->isBattleground() || bg->HasFreeSlots())
+            {
                 BattlegroundQueueTypeId queueTypeId =
                     BattlegroundMgr::BGQueueTypeId(bg->GetBgTypeID(), bg->GetArenaType());
 
@@ -863,6 +865,19 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
     m_SelectionPools[TEAM_ALLIANCE].Init();
     m_SelectionPools[TEAM_HORDE].Init();
 
+    // no new instance while invites are pending, waiters backfill the reopened slots instead (mod-cfbg#182)
+    bool const waitForPendingInvites = bg_template->isBattleground() &&
+        sWorld->getBoolConfig(CONFIG_BATTLEGROUND_WAIT_FOR_PENDING_INVITES);
+    if (waitForPendingInvites)
+    {
+        if (uint32 pendingInvites = GetPendingInvitesCount(bracket_id))
+        {
+            LOG_DEBUG("bg.battleground", "BattlegroundQueue: holding new instance for bgtype {} bracket {}, {} invites "
+                "pending", bgTypeId, bracket_id, pendingInvites);
+            return;
+        }
+    }
+
     // check if can start new premade battleground
     if (bg_template->isBattleground() && bgTypeId != BATTLEGROUND_RB && CheckPremadeMatch(bracket_id, MinPlayersPerTeam, MaxPlayersPerTeam))
     {
@@ -882,6 +897,10 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
         // clear structures
         m_SelectionPools[TEAM_ALLIANCE].Init();
         m_SelectionPools[TEAM_HORDE].Init();
+
+        // the premade instance has pending invites now, a normal one on top would split the bracket
+        if (waitForPendingInvites)
+            return;
     }
 
     // check if can start new normal battleground or non-rated arena
@@ -1103,6 +1122,29 @@ uint32 BattlegroundQueue::GetPlayersCountInGroupsQueue(BattlegroundBracketId bra
             playersCount += static_cast<uint32>(itr->Players.size());
 
     return playersCount;
+}
+
+uint32 BattlegroundQueue::GetPendingInvitesCount(BattlegroundBracketId bracket_id) const
+{
+    uint32 pendingInvites = 0;
+
+    for (uint8 i = 0; i < BG_QUEUE_MAX; ++i)
+    {
+        for (GroupQueueInfo const* ginfo : m_QueuedGroups[bracket_id][i])
+        {
+            if (!ginfo->IsInvitedToBGInstanceGUID)
+                continue;
+
+            // members who accepted are already erased from Players
+            Battleground* bg = sBattlegroundMgr->GetBattleground(ginfo->IsInvitedToBGInstanceGUID, ginfo->BgTypeId);
+
+            // a running BG doesn't count, its leavers would keep the bracket held with backfill invites
+            if (bg && bg->GetStatus() == STATUS_WAIT_JOIN)
+                pendingInvites += static_cast<uint32>(ginfo->Players.size());
+        }
+    }
+
+    return pendingInvites;
 }
 
 bool BattlegroundQueue::IsAllQueuesEmpty(BattlegroundBracketId bracket_id)
