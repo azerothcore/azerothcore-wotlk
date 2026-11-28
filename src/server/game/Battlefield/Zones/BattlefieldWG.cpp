@@ -22,7 +22,6 @@
 #include "AreaDefines.h"
 #include "BattlefieldWG.h"
 #include "ScriptMgr.h"
-#include "Chat.h"
 #include "GameGraveyard.h"
 #include "GameTime.h"
 #include "MapMgr.h"
@@ -313,9 +312,6 @@ void BattlefieldWG::OnBattleStart()
         UpdateTenacityList.clear();
         context.Repeat(10s);
     });
-
-    if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
-        ChatHandler(nullptr).SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE);
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
