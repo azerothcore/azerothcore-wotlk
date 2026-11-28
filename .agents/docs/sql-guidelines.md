@@ -34,7 +34,9 @@ can't apply.
   clear with `x` = `x` & ~N, keeping the row's other bits, sniffed values included. Assign an absolute value only when
   the whole field is the intended data, e.g. a deliberate template reset such as `npcflag` = 0. A `creature` spawn's
   `npcflag`, `unit_flags` or `dynamicflags` of 0 means the template's value: compute a spawn edit from that effective
-  value; writing 0 there restores inheritance, it never clears.
+  value; writing 0 there restores inheritance, it never clears. A comment naming the bits spells them as the
+  defines header does (`UNIT_FLAG_SWIMMING` in `UnitDefines.h`). Typos and invented names ship with the
+  comment, so read it back before committing.
 - New `creature`/`gameobject` guids: prefer free gaps (Keira3's unused-guid finder, or a gap query over base, merged
   updates and `pending_db_world`) over appending past the max, and confirm each is unused: the idempotency `DELETE` on
   `guid` and `id` leaves a different entry on that guid, so the import fails on a duplicate `PRIMARY` key.
@@ -46,6 +48,8 @@ can't apply.
   `difficulty_entry_*` template, the per-difficulty spell ids (10/25-man, normal/heroic: conditions,
   `spell_script_names`, SpellInfo corrections), the other faction's quest. Per-variant values still follow the sniffs;
   `flags_extra` must match across variants: the engine reads the base or the difficulty entry depending on call site.
+  A `conditions` row matches the base `creature_template` entry: `Creature::InitEntry` keeps the base entry in
+  every difficulty, so one row covers the `difficulty_entry_*` variants.
 
 ## The three databases
 
