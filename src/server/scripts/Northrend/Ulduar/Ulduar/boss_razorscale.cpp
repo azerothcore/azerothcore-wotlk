@@ -316,6 +316,13 @@ struct boss_razorscale : public BossAI
         HandleMusic(true);
     }
 
+    // She fights the raid. An Expedition NPC on her threat list would otherwise still be her victim once the
+    // players are gone, and she would go on fighting it instead of resetting.
+    bool CanAIAttack(Unit const* target) const override
+    {
+        return target && (target->IsPlayer() || target->GetCharmerOrOwnerPlayerOrPlayerItself());
+    }
+
     void ScheduleAirEvents()
     {
         events.SetPhase(PHASE_AIR);
@@ -547,6 +554,14 @@ struct boss_razorscale : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
+        // The Defenders and the adds she damages keep her on their threat lists, which stops her own evade check
+        // from firing (see Creature::SelectVictim), so the encounter ends here once no player is left to fight her.
+        if (me->IsInCombat() && !SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true))
+        {
+            EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+            return;
+        }
+
         if (!UpdateVictim())
             return;
 
@@ -745,6 +760,16 @@ struct npc_expedition_defender : public ScriptedAI
         me->SetRegeneratingHealth(false);
     }
 
+    // EnterEvadeMode strips auras before it calls this, so a Defender evading between add waves would lose
+    // Threat for the rest of the fight. Fresh ones are summoned out of combat and still wait for the pull.
+    void Reset() override
+    {
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* razorscale = instance->GetCreature(BOSS_RAZORSCALE))
+                if (razorscale->IsInCombat())
+                    DoCastSelf(SPELL_THREAT);
+    }
+
     bool CanAIAttack(Unit const* target) const override
     {
         return target && target->GetEntry() != NPC_RAZORSCALE_SPAWNER;
@@ -779,7 +804,7 @@ private:
 
 struct npc_expedition_trapper : public ScriptedAI
 {
-    explicit npc_expedition_trapper(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()), _idx(0)
+    explicit npc_expedition_trapper(Creature* creature) : ScriptedAI(creature), _idx(0)
     {
         me->SetCombatMovement(false);
         me->SetReactState(REACT_PASSIVE);
@@ -818,8 +843,7 @@ struct npc_expedition_trapper : public ScriptedAI
         if (type != POINT_MOTION_TYPE || pointId != POINT_TRAPPER_HOLD)
             return;
 
-        if (Creature* razorscale = _instance ? _instance->GetCreature(BOSS_RAZORSCALE) : nullptr)
-            DoCast(razorscale, SPELL_SHACKLE);
+        DoCastSelf(SPELL_SHACKLE);
     }
 
     void UpdateAI(uint32 diff) override
@@ -828,7 +852,6 @@ struct npc_expedition_trapper : public ScriptedAI
     }
 
 private:
-    InstanceScript* _instance;
     uint8 _idx;
 };
 
