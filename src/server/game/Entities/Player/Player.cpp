@@ -2612,6 +2612,17 @@ void Player::InitTalentForLevel()
         SendTalentsInfoData(false);                         // update at client
 }
 
+void Player::InitTaxiNodesForLevel()
+{
+    uint32 taxiClass = getClass();
+
+    // Scripts can deny the Death Knight starting flight paths through CLASS_CONTEXT_TAXI
+    if (taxiClass == CLASS_DEATH_KNIGHT && !IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TAXI))
+        taxiClass = CLASS_NONE;
+
+    m_taxi.InitTaxiNodesForLevel(getRace(), taxiClass, GetLevel());
+}
+
 void Player::InitStatsForLevel(bool reapplyMods)
 {
     if (reapplyMods)                                        //reapply stats values only on .reset stats (level) command

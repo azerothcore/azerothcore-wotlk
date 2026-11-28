@@ -1149,7 +1149,7 @@ public:
     PlayerSocial* GetSocial() { return m_social; }
 
     PlayerTaxi m_taxi;
-    void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getRace(), getClass(), GetLevel()); }
+    void InitTaxiNodesForLevel();
     bool ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc = nullptr, uint32 spellid = 1);
     bool ActivateTaxiPathTo(uint32 taxi_path_id, uint32 spellid = 1);
     void CleanupAfterTaxiFlight();
