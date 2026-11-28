@@ -116,6 +116,10 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         player->SendItemRetrievalMail(lootItem->itemid, lootItem->count);
     }
 
+    // Other players may still be viewing this corpse, even if their loot window is empty.
+    if (lootItem && msg == EQUIP_ERR_OK && lguid.IsCreatureOrVehicle() && loot->loot_type == LOOT_CORPSE && loot->isLooted())
+        loot->pendingCorpseLootCleanup = true;
+
     // If player is removing the last LootItem, delete the empty container.
     if (loot->isLooted() && lguid.IsItem())
         DoLootRelease(lguid);
@@ -326,6 +330,43 @@ void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
             DoLootRelease(lguid);
 }
 
+// A different corpse may have supplied the last item for a shared quest objective.
+static void RemoveUnneededMasterQuestItems(Creature& creature, Player const& player)
+{
+    Loot& loot = creature.loot;
+    Group const* group = player.GetGroup();
+    if (loot.loot_type != LOOT_CORPSE || !group || group->GetLootMethod() != MASTER_LOOT ||
+        group->GetMasterLooterGuid() != player.GetGUID() || creature.GetLootRecipientGroup() != group)
+        return;
+
+    for (LootItem& item : loot.quest_items)
+    {
+        if (!item.follow_loot_rules || !item.is_blocked || !item.is_counted || item.is_looted || item.freeforall)
+            continue;
+
+        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item.itemid);
+        if (!proto || proto->HasFlagCu(ITEM_FLAGS_CU_IGNORE_QUEST_STATUS))
+            continue;
+
+        auto const& members = group->GetMemberSlots();
+        bool const stillNeeded = std::any_of(members.begin(), members.end(), [&](Group::MemberSlot const& member)
+        {
+            Player* recipient = ObjectAccessor::GetPlayer(creature, member.guid);
+            // Preserve the award when a member's quest progress cannot be checked.
+            bool showInLoot = true;
+            return !recipient || recipient->HasQuestForItem(item.itemid, 0, false, &showInLoot);
+        });
+        if (!stillNeeded)
+        {
+            item.is_looted = true;
+            --loot.unlootedCount;
+            loot.NotifyQuestItemRemoved(item.itemIndex);
+            if (loot.isLooted())
+                loot.pendingCorpseLootCleanup = true;
+        }
+    }
+}
+
 void WorldSession::DoLootRelease(ObjectGuid lguid)
 {
     Player*  player = GetPlayer();
@@ -457,8 +498,12 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             return;
 
         loot = &creature->loot;
+        RemoveUnneededMasterQuestItems(*creature, *player);
         if (loot->isLooted())
         {
+            if (loot->pendingCorpseLootCleanup)
+                loot->CloseLootSessions(*creature);
+
             // skip pickpocketing loot for speed, skinning timer reduction is no-op in fact
             if (!creature->IsAlive())
                 creature->AllLootRemovedFromCorpse();
@@ -545,13 +590,24 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (!loot)
         return;
 
-    if (slotid >= loot->items.size() + loot->quest_items.size())
+    uint32 itemIndex = slotid;
+    bool const questSlot = slotid >= loot->items.size();
+    if (questSlot)
     {
-        LOG_DEBUG("loot", "MasterLootItem: Player {} might be using a hack! (slot {}, size {})", GetPlayer()->GetName(), slotid, (unsigned long)loot->items.size());
-        return;
-    }
+        auto const& views = loot->GetPlayerQuestItems();
+        auto view = views.find(_player->GetGUID());
+        uint32 questSlotIndex = slotid - loot->items.size();
+        if (view == views.end() || questSlotIndex >= view->second->size())
+            return;
 
-    LootItem& item = slotid >= loot->items.size() ? loot->quest_items[slotid - loot->items.size()] : loot->items[slotid];
+        QuestItem const& slot = view->second->at(questSlotIndex);
+        if (slot.is_looted)
+            return;
+        itemIndex = slot.index;
+    }
+    LootItem& item = questSlot ? loot->quest_items[itemIndex] : loot->items[itemIndex];
+    if (!questSlot && item.is_underthreshold && !item.conditions.empty())
+        return;
 
     ItemPosCountVec dest;
     InventoryResult msg = target->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item.itemid, item.count);
@@ -569,6 +625,12 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
+    if (item.is_looted || !item.count)
+        return;
+
+    // Recipient eligibility may also have changed since the first loot window.
+    loot->CountSharedDrop(item);
+
     // list of players allowed to receive this item in trade
     AllowedLooterSet looters = item.GetAllowedLooters();
 
@@ -581,6 +643,12 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     item.count = 0;
     item.is_looted = true;
 
-    loot->NotifyItemRemoved(slotid);
+    if (questSlot)
+        loot->NotifyQuestItemRemoved(itemIndex);
+    else
+        loot->NotifyItemRemoved(slotid);
     --loot->unlootedCount;
+
+    if (loot->isLooted() && loot->loot_type == LOOT_CORPSE && lootguid.IsCreatureOrVehicle())
+        loot->pendingCorpseLootCleanup = true;
 }

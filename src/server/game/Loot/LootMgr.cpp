@@ -21,6 +21,7 @@
 #include "Group.h"
 #include "ItemEnchantmentMgr.h"
 #include "Log.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -443,8 +444,14 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
     // check quest requirements
     if (!pProto->HasFlagCu(ITEM_FLAGS_CU_IGNORE_QUEST_STATUS))
     {
-        if (needs_quest && !player->HasQuestForItem(itemid))
-            return false;
+        if (needs_quest)
+        {
+            Group const* group = player->GetGroup();
+            bool const masterQuest = follow_loot_rules && !freeforall && group && group->GetLootMethod() == MASTER_LOOT;
+            bool showInLoot = true;
+            if (!player->HasQuestForItem(itemid, 0, false, masterQuest ? &showInLoot : nullptr))
+                return false;
+        }
 
         // Hide quest starter items when quest is already started/rewarded,
         // when unique count is already reached, or when prerequisite is missing.
@@ -532,7 +539,7 @@ void Loot::AddItem(LootStoreItem const& item)
         // free for all items are counted in FillFFALoot(),
         // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
         if (!item.needs_quest && item.conditions.empty() && !proto->HasFlag(ITEM_FLAG_MULTI_DROP))
-            ++unlootedCount;
+            CountSharedDrop(lootItems.back());
     }
 }
 
@@ -590,6 +597,46 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     else
         FillNotNormalLootFor(lootOwner);
 
+    return true;
+}
+
+void Loot::CountSharedDrop(LootItem& item)
+{
+    if (!item.freeforall && !item.is_looted && !item.is_counted)
+    {
+        ++unlootedCount;
+        item.is_counted = true;
+    }
+}
+
+// A player who qualifies at roll time also needs a slot for a later manual claim.
+bool Loot::RegisterSharedDrop(LootItem& item, ObjectGuid playerGuid)
+{
+    if (item.freeforall || item.is_looted)
+        return false;
+
+    if (item.needs_quest || !item.conditions.empty())
+    {
+        QuestItemMap& views = item.needs_quest ? PlayerQuestItems : PlayerNonQuestNonFFAConditionalItems;
+        auto itr = views.find(playerGuid);
+        QuestItemList* view = itr == views.end() ? nullptr : itr->second;
+        bool const hasSlot = view && std::any_of(view->begin(), view->end(),
+            [&](QuestItem const& entry) { return entry.index == item.itemIndex; });
+        if (!hasSlot)
+        {
+            if (item.needs_quest && items.size() + (view ? view->size() : 0) >= MAX_NR_LOOT_ITEMS)
+                return false;
+
+            if (!view)
+            {
+                view = new QuestItemList();
+                views.emplace(playerGuid, view);
+            }
+            view->emplace_back(item.itemIndex);
+        }
+    }
+
+    CountSharedDrop(item);
     return true;
 }
 
@@ -684,11 +731,8 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
             {
                 ++unlootedCount;
             }
-            else if (!item.is_counted)
-            {
-                ++unlootedCount;
-                item.is_counted = true;
-            }
+            else
+                CountSharedDrop(item);
         }
 
         if (items.size() + ql->size() == MAX_NR_LOOT_ITEMS)
@@ -720,11 +764,7 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
             if (!item.conditions.empty())
             {
                 ql->push_back(QuestItem(i));
-                if (!item.is_counted)
-                {
-                    ++unlootedCount;
-                    item.is_counted = true;
-                }
+                CountSharedDrop(item);
             }
         }
     }
@@ -742,6 +782,12 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
 
 void Loot::NotifyItemRemoved(uint8 lootIndex)
 {
+    if (lootIndex >= items.size())
+    {
+        NotifyQuestItemRemoved(lootIndex - items.size());
+        return;
+    }
+
     // notify all players that are looting this that the item was removed
     // convert the index to the slot the player sees
     PlayersLootingSet::iterator i_next;
@@ -754,6 +800,21 @@ void Loot::NotifyItemRemoved(uint8 lootIndex)
         else
             PlayersLooting.erase(i);
     }
+}
+
+void Loot::CloseLootSessions(WorldObject const& source)
+{
+    for (ObjectGuid const& guid : PlayersLooting)
+    {
+        Player* player = ObjectAccessor::GetPlayer(source, guid);
+        if (player && player->GetLootGUID() == source.GetGUID())
+        {
+            player->SetLootGUID(ObjectGuid::Empty);
+            player->SendLootRelease(source.GetGUID());
+            player->RemoveUnitFlag(UNIT_FLAG_LOOTING);
+        }
+    }
+    PlayersLooting.clear();
 }
 
 void Loot::NotifyMoneyRemoved()
@@ -818,6 +879,25 @@ void Loot::generateMoneyLoot(uint32 minAmount, uint32 maxAmount)
     }
 }
 
+// A below-threshold conditional drop is reserved only while the owner can claim it.
+static bool CanClaimRoundRobinConditional(Loot const& loot, LootItem const& item, Player const* viewer)
+{
+    if (!item.AllowedForPlayer(viewer, loot.sourceWorldObjectGUID))
+        return false;
+
+    if (!loot.roundRobinPlayer || loot.roundRobinPlayer == viewer->GetGUID())
+        return true;
+
+    Player* owner = ObjectAccessor::GetPlayer(*viewer, loot.roundRobinPlayer);
+    if (!owner || owner->GetGroup() != viewer->GetGroup() || !item.AllowedForPlayer(owner, loot.sourceWorldObjectGUID))
+        return true;
+
+    auto const& views = loot.GetPlayerNonQuestNonFFAConditionalItems();
+    auto view = views.find(loot.roundRobinPlayer);
+    return view == views.end() || std::none_of(view->second->begin(), view->second->end(),
+        [&](QuestItem const& slot) { return slot.index == item.itemIndex && !slot.is_looted; });
+}
+
 LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem * *qitem, QuestItem * *ffaitem, QuestItem * *conditem)
 {
     LootItem* item = nullptr;
@@ -832,6 +912,11 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem * *qit
             if (qitem)
                 *qitem = qitem2;
             item = &quest_items[qitem2->index];
+            // Shared quest loot under Master Loot must go through the assignment handler.
+            if (item->is_blocked && item->follow_loot_rules && !item->freeforall &&
+                player->GetGroup() && player->GetGroup()->GetLootMethod() == MASTER_LOOT)
+                return nullptr;
+
             if (item->follow_loot_rules && !item->AllowedForPlayer(player, sourceWorldObjectGUID)) // pussywizard: such items (follow_loot_rules) are added to every player, but not everyone is allowed, check it here
                 return nullptr;
             is_looted = qitem2->is_looted;
@@ -859,6 +944,10 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem * *qit
         }
         else if (!item->conditions.empty())
         {
+            if (item->is_underthreshold && player->GetGroup() && player->GetGroup()->GetLootMethod() == MASTER_LOOT
+                && !CanClaimRoundRobinConditional(*this, *item, player))
+                return nullptr;
+
             QuestItemMap::const_iterator itr = PlayerNonQuestNonFFAConditionalItems.find(player->GetGUID());
             if (itr != PlayerNonQuestNonFFAConditionalItems.end())
             {
@@ -906,6 +995,13 @@ bool Loot::hasItemForAll() const
 // return true if there is any FFA, quest or conditional item for the player.
 bool Loot::hasItemFor(Player* player) const
 {
+    // The master may need to reopen the corpse after exhausting the current quest slots.
+    Group const* group = player->GetGroup();
+    if (group && group->GetLootMethod() == MASTER_LOOT && group->GetMasterLooterGuid() == player->GetGUID())
+        for (LootItem const& item : quest_items)
+            if (item.follow_loot_rules && item.is_blocked && item.is_counted && !item.is_looted && !item.freeforall)
+                return true;
+
     QuestItemMap const& lootPlayerQuestItems = GetPlayerQuestItems();
     QuestItemMap::const_iterator q_itr = lootPlayerQuestItems.find(player->GetGUID());
     if (q_itr != lootPlayerQuestItems.end())
@@ -971,6 +1067,56 @@ ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li)
     return b;
 }
 
+// FillQuestLoot counts each eligible player's personal drop, but also creates uncounted slots for the master.
+static void RetirePersonalQuestSlot(Loot& loot, QuestItem const& slot, Player const* viewer)
+{
+    LootItem const& item = loot.quest_items[slot.index];
+    if (item.freeforall && !item.is_looted && !slot.is_looted && item.GetAllowedLooters().contains(viewer->GetGUID()))
+    {
+        --loot.unlootedCount;
+        if (loot.loot_type == LOOT_CORPSE && loot.sourceWorldObjectGUID.IsCreatureOrVehicle() && loot.isLooted())
+            loot.pendingCorpseLootCleanup = true;
+    }
+}
+
+// Reuse quest slots only when sending a fresh window. An open window keeps its original slot mapping.
+static void RefreshMasterQuestSlots(Loot& loot, Player const* master)
+{
+    for (LootItem& pending : loot.quest_items)
+    {
+        if (!pending.follow_loot_rules || !pending.is_blocked || !pending.is_counted || pending.is_looted || pending.freeforall)
+            continue;
+
+        if (loot.RegisterSharedDrop(pending, master->GetGUID()))
+            continue;
+
+        auto const& views = loot.GetPlayerQuestItems();
+        auto view = views.find(master->GetGUID());
+        if (view == views.end())
+            return;
+
+        auto reusable = std::find_if(view->second->begin(), view->second->end(), [&](QuestItem const& slot)
+        {
+            LootItem const& current = loot.quest_items[slot.index];
+            if (slot.is_looted || current.is_looted)
+                return true;
+
+            // Initial population also gives the master entries for other players' quests.
+            // A counted shared drop still needs its assignment slot or the master's original claim slot.
+            if (!current.freeforall && current.is_counted &&
+                (current.follow_loot_rules || current.GetAllowedLooters().contains(master->GetGUID())))
+                return false;
+
+            return !current.AllowedForPlayer(master, loot.sourceWorldObjectGUID);
+        });
+        if (reusable != view->second->end())
+        {
+            RetirePersonalQuestSlot(loot, *reusable, master);
+            *reusable = QuestItem(pending.itemIndex);
+        }
+    }
+}
+
 ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 {
     if (lv.permission == NONE_PERMISSION)
@@ -981,6 +1127,8 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
     }
 
     Loot& l = lv.loot;
+    if (lv.permission == MASTER_PERMISSION)
+        RefreshMasterQuestSlots(l, lv.viewer);
 
     uint8 itemsShown = 0;
 
@@ -995,13 +1143,11 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         case MASTER_PERMISSION:
         case RESTRICTED_PERMISSION:
             {
-                bool isMasterLooter = lv.viewer->GetGroup() && lv.viewer->GetGroup()->GetMasterLooterGuid() == lv.viewer->GetGUID();
-
                 // if you are not the round-robin group looter, you can only see
                 // blocked rolled items and quest items, and !ffa items
                 for (uint8 i = 0; i < l.items.size(); ++i)
                 {
-                    if (!l.items[i].is_looted && !l.items[i].freeforall && (l.items[i].conditions.empty() || isMasterLooter) && l.items[i].AllowedForPlayer(lv.viewer, l.sourceWorldObjectGUID))
+                    if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer, l.sourceWorldObjectGUID))
                     {
                         uint8 slot_type = 0;
 
@@ -1106,12 +1252,26 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             LootItem& item = l.quest_items[qi->index];
             if (!qi->is_looted && !item.is_looted)
             {
+                if (lv.permission == MASTER_PERMISSION && item.follow_loot_rules && !item.freeforall)
+                {
+                    b << uint8(l.items.size() + (qi - q_list->begin())) << item << uint8(LOOT_SLOT_TYPE_MASTER);
+                    ++itemsShown;
+                    continue;
+                }
+
                 bool showInLoot = true;
                 bool hasQuestForItem = lv.viewer->HasQuestForItem(item.itemid, 0, false, &showInLoot);
                 if (!hasQuestForItem)
                 {
                     if (!showInLoot)
                     {
+                        // A recipient who has enough in the bank cannot consume another player's pending award.
+                        if (lv.permission == RESTRICTED_PERMISSION && item.follow_loot_rules && !item.freeforall)
+                            continue;
+
+                        if (lv.permission == MASTER_PERMISSION)
+                            RetirePersonalQuestSlot(l, *qi, lv.viewer);
+
                         const_cast<QuestItem*>(&(*qi))->is_looted = true;
                         if (!item.freeforall)
                         {
@@ -1191,9 +1351,21 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             LootItem& item = l.items[ci->index];
             if (!ci->is_looted && !item.is_looted)
             {
+                if (item.is_underthreshold && (lv.permission == MASTER_PERMISSION || lv.permission == RESTRICTED_PERMISSION))
+                {
+                    if (!CanClaimRoundRobinConditional(l, item, lv.viewer))
+                        continue;
+
+                    b << uint8(ci->index) << item << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT);
+                    ++itemsShown;
+                    continue;
+                }
+
                 b << uint8(ci->index);
                 b << item;
-                if (item.follow_loot_rules)
+                if (item.is_blocked && lv.permission == RESTRICTED_PERMISSION)
+                    b << uint8(LOOT_SLOT_TYPE_LOCKED);
+                else if (item.follow_loot_rules)
                 {
                     switch (lv.permission)
                     {
