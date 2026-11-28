@@ -174,7 +174,7 @@ std::unordered_set<uint32> sPetTalentSpells;
 DBCStorage <TalentTabEntry> sTalentTabStore(TalentTabEntryfmt);
 
 // store absolute bit position for first rank for talent inspect
-static uint32 sTalentTabPages[MAX_CLASSES][3];
+static uint32 sTalentTabPages[MAX_CLASSES][MAX_TALENT_TABS];
 
 DBCStorage <TaxiNodesEntry> sTaxiNodesStore(TaxiNodesEntryfmt);
 TaxiMask sTaxiNodesMask;
@@ -536,6 +536,13 @@ void LoadDBCStores(std::string const& dataPath)
                 continue;
 
             // store class talent tab pages
+            if (talentTabInfo->tabpage >= MAX_TALENT_TABS)
+            {
+                LOG_ERROR("dbc", "TalentTab.dbc: tab {} has tabpage {} (max {}), skipped",
+                    talentTabId, talentTabInfo->tabpage, MAX_TALENT_TABS - 1);
+                continue;
+            }
+
             for (uint32 cls = 1; cls < MAX_CLASSES; ++cls)
                 if (talentTabInfo->ClassMask & (1 << (cls - 1)))
                     sTalentTabPages[cls][talentTabInfo->tabpage] = talentTabId;
