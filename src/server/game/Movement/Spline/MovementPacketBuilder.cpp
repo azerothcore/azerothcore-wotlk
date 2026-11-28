@@ -67,10 +67,9 @@ namespace Movement
                 break;
         }
 
-        // add fake Enter_Cycle flag - needed for client-side cyclic movement (client will erase first spline vertex after first cycle done)
-        // Xinef: this flag breaks cycle for ground movement, client teleports npc between last and first point instead of using smooth movement
-        if (splineflags & MoveSplineFlag::Flying)
-            splineflags.enter_cycle = move_spline.isCyclic();
+        // The Enter_Cycle flag is set when the spline is launched: a flying cycle is entered through its first vertex,
+        // which the client drops after the first cycle. It is deliberately never set for a ground cycle, where the
+        // client teleports the unit between the last and first point instead of moving it smoothly.
         data << uint32(splineflags & uint32(~MoveSplineFlag::Mask_No_Monster_Move));
 
         if (splineflags.animation)
@@ -125,15 +124,18 @@ namespace Movement
 
     void WriteCatmullRomCyclicPath(Spline<int32> const& spline, ByteBuffer& data, bool flying)
     {
-        uint32 count = spline.getPointCount() - 3;
-        data << uint32(count + 1);
         if (flying)
         {
-            data << spline.getPoint(1); // fake point, client will erase it from the spline after first cycle done
+            // The first vertex is the leg into the cycle: it is sent as the packet's start position and dropped
+            // after the first cycle, so it is not part of the spline points.
+            uint32 count = spline.getPointCount() - 4;
+            data << count;
             data.append<Vector3>(&spline.getPoint(2), count);
         }
         else
         {
+            uint32 count = spline.getPointCount() - 3;
+            data << uint32(count + 1);
             data.append<Vector3>(&spline.getPoint(2), count);
             data << Vector3::zero(); //Xinef: fake point
         }
