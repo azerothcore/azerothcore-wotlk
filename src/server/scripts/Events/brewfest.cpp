@@ -1757,6 +1757,9 @@ struct npc_direbrew_minion : public ScriptedAI
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
+        if (!_instance)
+            return;
+
         if (Creature* coren = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_COREN)))
         {
             coren->AI()->JustSummoned(me);
