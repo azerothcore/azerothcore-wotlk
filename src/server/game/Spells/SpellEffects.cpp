@@ -4242,8 +4242,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     else
     {
         // in dungeons (or for nonplayers), reset this unit on all enemies' threat lists
-        for (auto const& pair : unitTarget->GetThreatMgr().GetThreatenedByMeList())
-            pair.second->ScaleThreat(0.0f);
+        unitTarget->GetThreatMgr().ResetAllMyThreatOnOthers();
     }
 
     UnitList targets;
