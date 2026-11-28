@@ -957,6 +957,20 @@ class spell_mage_summon_water_elemental : public SpellScript
     }
 };
 
+// Shared spend rule for the 74396 charges and the 44544 last-charge window:
+// normal spells spend on cast, triggered spells (Blizzard ticks) on hit, channeled spells never
+static bool CanSpendFingersOfFrost(ProcEventInfo& eventInfo)
+{
+    Spell const* spell = eventInfo.GetProcSpell();
+    if (!spell || spell->IsTriggered())
+        return true;
+
+    if (spell->GetSpellInfo()->IsChanneled())
+        return false;
+
+    return (eventInfo.GetSpellPhaseMask() & PROC_SPELL_PHASE_CAST) != 0;
+}
+
 // 74396 - Fingers of Frost
 class spell_mage_fingers_of_frost : public AuraScript
 {
@@ -969,34 +983,69 @@ class spell_mage_fingers_of_frost : public AuraScript
 
     void PrepareProc(ProcEventInfo& eventInfo)
     {
-        if (Spell const* spell = eventInfo.GetProcSpell())
+        if (!CanSpendFingersOfFrost(eventInfo))
+            PreventDefaultAction();
+    }
+
+    // A spell queued behind the cast that spent the last charge runs in the next update, after this
+    // aura is gone: keep 44544 with one internal charge until that update (spell batching)
+    void HandleAfterProc(ProcEventInfo& eventInfo)
+    {
+        if (GetCharges())
+            return;
+
+        Spell const* spell = eventInfo.GetProcSpell();
+        if (!spell || spell->IsTriggered() || !(eventInfo.GetSpellPhaseMask() & PROC_SPELL_PHASE_CAST))
+            return;
+
+        Unit* target = GetTarget();
+        Aura* aurastate = target->GetAura(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA);
+        if (!aurastate)
+            return;
+
+        aurastate->SetCharges(1);
+
+        // runs after the next update's spell queue, unless a new proc refreshed 44544 meanwhile
+        target->m_Events.AddEventAtOffset([target]()
         {
-            bool isTriggered = spell->IsTriggered();
-            bool isCastPhase = (eventInfo.GetSpellPhaseMask() & PROC_SPELL_PHASE_CAST) != 0;
-            bool isChanneled = spell->GetSpellInfo()->IsChanneled();
-            bool prevent = false;
-
-            if (isTriggered)
-                prevent = false;
-            else if (isChanneled)
-                prevent = true;
-            else if (!isCastPhase)
-                prevent = true;
-
-            if (prevent)
-                PreventDefaultAction();
-        }
+            if (Aura* aura = target->GetAura(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA))
+                if (aura->IsUsingCharges())
+                    aura->Remove();
+        }, 1ms);
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
+        // Keep 44544 while the last-charge window is open, it goes once used or at the next update
+        Aura const* aurastate = GetTarget()->GetAura(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA);
+        if (aurastate && aurastate->IsUsingCharges())
+            return;
+
         GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA);
     }
 
     void Register() override
     {
         DoPrepareProc += AuraProcFn(spell_mage_fingers_of_frost::PrepareProc);
+        AfterProc += AuraProcFn(spell_mage_fingers_of_frost::HandleAfterProc);
         AfterEffectRemove += AuraEffectRemoveFn(spell_mage_fingers_of_frost::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 44544 - Fingers of Frost
+class spell_mage_fingers_of_frost_aurastate : public AuraScript
+{
+    PrepareAuraScript(spell_mage_fingers_of_frost_aurastate);
+
+    // Only procs while the last-charge window is open, the core then consumes the charge and removes the aura
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return GetAura()->IsUsingCharges() && CanSpendFingersOfFrost(eventInfo);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_mage_fingers_of_frost_aurastate::CheckProc);
     }
 };
 
@@ -1675,6 +1724,7 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_polymorph_cast_visual);
     RegisterSpellScript(spell_mage_summon_water_elemental);
     RegisterSpellScript(spell_mage_fingers_of_frost);
+    RegisterSpellScript(spell_mage_fingers_of_frost_aurastate);
     RegisterSpellScript(spell_mage_magic_absorption);
     RegisterSpellScript(spell_mage_deep_freeze_immunity_state);
 }
