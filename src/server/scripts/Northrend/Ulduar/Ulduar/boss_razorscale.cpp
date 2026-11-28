@@ -148,6 +148,7 @@ enum RazorscaleMisc
     POINT_RAZORSCALE_TAKEOFF = 4,
     POINT_RAZORSCALE_FLIGHT_2 = 5,
     POINT_DEFENDER_ATTACK = 10,
+    POINT_TRAPPER_HOLD = 11,
 
     WORLD_STATE_RAZORSCALE_MUSIC = 4162,
 
@@ -179,6 +180,7 @@ enum ExpeditionSays
     // Expedition Engineer
     SAY_ENGINEER_PREPARE         = 0,
     SAY_ENGINEER_START_REPAIR    = 1,
+    SAY_ENGINEER_FIRES_OUT       = 2,
 };
 
 static Position const RazorFlightPos = {585.3610f, -173.5592f, 456.8430f, 1.526665f};
@@ -253,18 +255,18 @@ static uint32 HarpoonEntry(uint8 index, bool is25ManRaid)
 }
 
 static Position const DefenderPositions[6] = {
-    {624.3065f, -154.4163f, 391.6442f, 0.0f},
-    {611.6274f, -170.9375f, 391.8087f, 0.0f},
-    {572.1548f, -167.4471f, 391.8087f, 0.0f},
-    {558.4640f, -165.0114f, 391.8087f, 0.0f},
-    {603.3345f, -164.4297f, 391.8087f, 0.0f},
-    {549.1727f, -159.1180f, 391.8087f, 0.0f}
+    {550.3715f, -193.1024f, 391.5171f, 0.0f},
+    {559.5174f, -191.7292f, 391.5171f, 0.0f},
+    {578.2309f, -205.2830f, 391.5171f, 0.0f},
+    {606.4080f, -185.4931f, 391.5171f, 0.0f},
+    {621.3750f, -186.6111f, 391.5171f, 0.0f},
+    {637.3646f, -171.4844f, 391.1803f, 0.0f}
 };
 
 static Position const TrapperPositions[3] = {
-    {574.9293f, -184.5150f, 391.8921f, 0.0f},
-    {539.7838f, -178.5337f, 391.3053f, 0.0f},
-    {627.1754f, -177.9638f, 391.5553f, 0.0f}
+    {602.3543f, -175.3371f, 391.5171f, 0.0f}, // to her right
+    {563.4360f, -175.9461f, 391.5553f, 0.0f}, // to her left
+    {584.9335f, -192.9295f, 391.6421f, 0.0f}  // behind her
 };
 
 static uint32 const DwarfSummonSpells[3] = {SPELL_TRIGGER_SUMMON_IRON_DWARVES, SPELL_TRIGGER_SUMMON_IRON_DWARVES_2, SPELL_TRIGGER_SUMMON_IRON_DWARVES_3};
@@ -297,6 +299,7 @@ struct boss_razorscale : public BossAI
         if (Is25ManRaid())
             me->SummonCreatureGroup(GROUP_FIRE_STATE_25);
         me->SetImmuneToPC(true);
+        me->SetImmuneToNPC(true);
         me->SetCombatMovement(false);
         me->SetAnimTier(AnimTier::Fly);
     }
@@ -305,11 +308,19 @@ struct boss_razorscale : public BossAI
     {
         BossAI::JustEngagedWith(who);
         me->SetImmuneToPC(false);
+        me->SetImmuneToNPC(false);
         instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
         ScheduleAirEvents();
         summons.DoAction(ACTION_START_FIGHT);
         events.ScheduleEvent(EVENT_BERSERK, 10min);
         HandleMusic(true);
+    }
+
+    // She fights the raid. An Expedition NPC on her threat list would otherwise still be her victim once the
+    // players are gone, and she would go on fighting it instead of resetting.
+    bool CanAIAttack(Unit const* target) const override
+    {
+        return target && (target->IsPlayer() || target->GetCharmerOrOwnerPlayerOrPlayerItself());
     }
 
     void ScheduleAirEvents()
@@ -358,9 +369,11 @@ struct boss_razorscale : public BossAI
                 events.CancelEvent(EVENT_SUMMON_MINIONS_DELAYED);
                 _harpoonHits = 0;
                 me->SetSpeedRate(MOVE_RUN, 3.0f);
-                me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_LAND, RazorLandPos, FORCED_MOVEMENT_NONE, 0.0f, false, false, AnimTier::Fly);
+                me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_LAND, RazorLandPos, FORCED_MOVEMENT_NONE, 40.0f, false, false, AnimTier::Fly);
                 EntryCheckPredicate commanderPred(NPC_EXPEDITION_COMMANDER);
                 summons.DoAction(ACTION_GROUND_PHASE, commanderPred);
+                EntryCheckPredicate trapperPred(NPC_EXPEDITION_TRAPPER);
+                summons.DoAction(ACTION_GROUND_PHASE, trapperPred);
                 break;
             }
             case ACTION_START_PERMA_GROUND:
@@ -401,7 +414,7 @@ struct boss_razorscale : public BossAI
                 break;
             case POINT_RAZORSCALE_LAND:
                 me->SetFacingTo(RazorLandPos.GetOrientation());
-                me->GetMotionMaster()->MoveLand(POINT_RAZORSCALE_GROUND, RazorGroundPos);
+                me->GetMotionMaster()->MoveLand(POINT_RAZORSCALE_GROUND, RazorGroundPos, 4.0f);
                 break;
             case POINT_RAZORSCALE_GROUND:
                 me->SetDisableGravity(false);
@@ -414,11 +427,7 @@ struct boss_razorscale : public BossAI
                 }
                 me->SetReactState(REACT_PASSIVE);
                 DoCastSelf(SPELL_STUN_SELF, true);
-                {
-                    EntryCheckPredicate trapperPred(NPC_EXPEDITION_TRAPPER);
-                    summons.DoAction(ACTION_GROUND_PHASE, trapperPred);
-                    events.ScheduleEvent(EVENT_FLAME_BREATH, 30s, 0, PHASE_GROUND);
-                }
+                events.ScheduleEvent(EVENT_FLAME_BREATH, 30800ms, 0, PHASE_GROUND);
                 break;
             case POINT_RAZORSCALE_TAKEOFF:
                 me->SetSpeedRate(MOVE_RUN, 3.0f);
@@ -545,6 +554,14 @@ struct boss_razorscale : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
+        // The Defenders and the adds she damages keep her on their threat lists, which stops her own evade check
+        // from firing (see Creature::SelectVictim), so the encounter ends here once no player is left to fight her.
+        if (me->IsInCombat() && !SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true))
+        {
+            EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+            return;
+        }
+
         if (!UpdateVictim())
             return;
 
@@ -591,7 +608,7 @@ struct boss_razorscale : public BossAI
                     me->RemoveAura(SPELL_STUN_SELF);
                     Talk(EMOTE_BREATH);
                     DoCastAOE(SPELL_FLAME_BREATH);
-                    events.ScheduleEvent(EVENT_WING_BUFFET, 2s, 0, PHASE_GROUND);
+                    events.ScheduleEvent(EVENT_WING_BUFFET, 3230ms, 0, PHASE_GROUND);
                     break;
                 case EVENT_FLAME_BREATH_GROUNDED:
                     Talk(EMOTE_BREATH);
@@ -743,14 +760,19 @@ struct npc_expedition_defender : public ScriptedAI
         me->SetRegeneratingHealth(false);
     }
 
+    // EnterEvadeMode strips auras before it calls this, so a Defender evading between add waves would lose
+    // Threat for the rest of the fight. Fresh ones are summoned out of combat and still wait for the pull.
     void Reset() override
     {
-        DoCastSelf(SPELL_THREAT);
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* razorscale = instance->GetCreature(BOSS_RAZORSCALE))
+                if (razorscale->IsInCombat())
+                    DoCastSelf(SPELL_THREAT);
     }
 
     bool CanAIAttack(Unit const* target) const override
     {
-        return target && target->GetEntry() != NPC_RAZORSCALE && target->GetEntry() != NPC_RAZORSCALE_SPAWNER;
+        return target && target->GetEntry() != NPC_RAZORSCALE_SPAWNER;
     }
 
     void SetData(uint32 /*type*/, uint32 value) override
@@ -760,8 +782,11 @@ struct npc_expedition_defender : public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        if (action == ACTION_START_FIGHT)
-            me->GetMotionMaster()->MovePoint(POINT_DEFENDER_ATTACK, DefenderPositions[_idx]);
+        if (action != ACTION_START_FIGHT)
+            return;
+
+        DoCastSelf(SPELL_THREAT);
+        me->GetMotionMaster()->MovePoint(POINT_DEFENDER_ATTACK, DefenderPositions[_idx], FORCED_MOVEMENT_NONE, 8.0f);
     }
 
     void MovementInform(uint32 type, uint32 pointId) override
@@ -798,14 +823,15 @@ struct npc_expedition_trapper : public ScriptedAI
         switch (action)
         {
             case ACTION_GROUND_PHASE:
-                me->GetMotionMaster()->MovePoint(1, TrapperPositions[_idx]);
+                me->GetMotionMaster()->MovePoint(POINT_TRAPPER_HOLD, TrapperPositions[_idx], FORCED_MOVEMENT_NONE, 16.0f);
                 break;
             case ACTION_START_FIGHT:
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                 break;
             case ACTION_STOP_CONTROLLERS:
                 me->InterruptNonMeleeSpells(false);
-                scheduler.Schedule(2s, [this](TaskContext const&) { me->GetMotionMaster()->MoveTargetedHome(); });
+                // the boss sends this as it starts the 1.5 s Wing Buffet cast and the push then takes ~3 s
+                scheduler.Schedule(4500ms, [this](TaskContext const&) { me->GetMotionMaster()->MoveTargetedHome(); });
                 break;
             default:
                 break;
@@ -814,8 +840,10 @@ struct npc_expedition_trapper : public ScriptedAI
 
     void MovementInform(uint32 type, uint32 pointId) override
     {
-        if (type == POINT_MOTION_TYPE && pointId == 1)
-            DoCastSelf(SPELL_SHACKLE);
+        if (type != POINT_MOTION_TYPE || pointId != POINT_TRAPPER_HOLD)
+            return;
+
+        DoCastSelf(SPELL_SHACKLE);
     }
 
     void UpdateAI(uint32 diff) override
@@ -849,13 +877,13 @@ struct npc_expedition_engineer : public NullCreatureAI
         switch (action)
         {
             case ACTION_PREPARE_TURRETS:
-                AnnounceRepairs(30s);
+                AnnounceRepairs();
                 break;
             case ACTION_START_FIGHT:
                 StartRepairing();
                 break;
             case ACTION_REBUILD_TURRETS:
-                AnnounceRepairs(28s);
+                AnnounceRebuild();
                 StartRepairing();
                 break;
             case ACTION_START_PERMA_GROUND:
@@ -867,16 +895,22 @@ struct npc_expedition_engineer : public NullCreatureAI
         }
     }
 
-    void AnnounceRepairs(Milliseconds startRepairDelay)
+    void AnnounceRepairs()
     {
         if (!IsEast())
             return;
 
         Talk(SAY_ENGINEER_PREPARE);
-        scheduler.Schedule(startRepairDelay, [this](TaskContext)
-        {
-            Talk(SAY_ENGINEER_START_REPAIR);
-        });
+        scheduler.Schedule(30s, [this](TaskContext) { Talk(SAY_ENGINEER_START_REPAIR); });
+    }
+
+    void AnnounceRebuild()
+    {
+        if (!IsEast())
+            return;
+
+        // the first cycle's two lines are not repeated: later cycles only say this, 30 s after take-off
+        scheduler.Schedule(30s, [this](TaskContext) { Talk(SAY_ENGINEER_FIRES_OUT); });
     }
 
     void StartRepairing()
