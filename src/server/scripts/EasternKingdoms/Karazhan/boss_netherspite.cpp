@@ -257,9 +257,8 @@ struct boss_netherspite : public BossAI
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
             {
-                // root blocks SetInFront, so turn him by hand, the breath cone fires along his facing
+                // face the target on the client too, the breath cone fires along his facing
                 float angle = me->GetAngle(target);
-                me->SetOrientation(angle);
                 me->SetFacingTo(angle);
                 DoCast(target, SPELL_NETHERBREATH);
                 scheduler.Schedule(3500ms, BANISH_PHASE, [this](TaskContext)
@@ -267,7 +266,6 @@ struct boss_netherspite : public BossAI
                     if (Unit* victim = me->GetVictim())
                     {
                         float victimAngle = me->GetAngle(victim);
-                        me->SetOrientation(victimAngle);
                         me->SetFacingTo(victimAngle);
                     }
                 });

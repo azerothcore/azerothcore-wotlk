@@ -16183,8 +16183,14 @@ void Unit::ExecuteDelayedUnitAINotifyEvent()
 
 void Unit::SetInFront(WorldObject const* target)
 {
-    if (!HasUnitState(UNIT_STATE_CANNOT_TURN))
-        SetOrientation(GetAngle(target));
+    if (HasUnitState(UNIT_STATE_CANNOT_TURN))
+        return;
+
+    // Scripts root a creature and DisableRotate() it to hold its facing through a cast
+    if (HasUnitState(UNIT_STATE_ROOT) && HasUnitFlag(UNIT_FLAG_POSSESSED) && !HasUnitState(UNIT_STATE_POSSESSED))
+        return;
+
+    SetOrientation(GetAngle(target));
 }
 
 void Unit::SetFacingTo(float ori)
