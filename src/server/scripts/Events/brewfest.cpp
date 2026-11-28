@@ -1744,17 +1744,6 @@ private:
     TaskScheduler _scheduler;
 };
 
-struct npc_direbrew_minion : public ScriptedAI
-{
-    npc_direbrew_minion(Creature* creature) : ScriptedAI(creature) {}
-
-    void Reset() override
-    {
-        me->SetFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
-        DoZoneInCombat();
-    }
-};
-
 struct npc_direbrew_antagonist : public ScriptedAI
 {
     npc_direbrew_antagonist(Creature* creature) : ScriptedAI(creature) {}
@@ -2019,7 +2008,6 @@ void AddSC_event_brewfest_scripts()
     // Coren Direbrew
     RegisterCreatureAI(npc_coren_direbrew);
     RegisterCreatureAI(npc_coren_direbrew_sisters);
-    RegisterCreatureAI(npc_direbrew_minion);
     RegisterCreatureAI(npc_direbrew_antagonist);
     new go_direbrew_mole_machine();
     RegisterSpellScript(spell_direbrew_summon_mole_machine_target_picker);
