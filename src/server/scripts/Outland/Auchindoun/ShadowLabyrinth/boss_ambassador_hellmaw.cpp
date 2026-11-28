@@ -90,7 +90,7 @@ struct boss_ambassador_hellmaw : public BossAI
         me->GetMotionMaster()->MoveWaypoint(PATH_ID_START, false);
     }
 
-    void JustEngagedWith(Unit*) override
+    void JustEngagedWith(Unit* who) override
     {
         if (isBanished)
         {
@@ -114,7 +114,7 @@ struct boss_ambassador_hellmaw : public BossAI
                 DoCastSelf(SPELL_ENRAGE, true);
             });
         }
-        _JustEngagedWith();
+        _JustEngagedWith(who);
     }
 
     void MoveInLineOfSight(Unit* who) override

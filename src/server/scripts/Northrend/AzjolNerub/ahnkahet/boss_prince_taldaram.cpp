@@ -318,9 +318,9 @@ struct boss_taldaram : public BossAI
         Talk(SAY_SLAY);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
         ScheduleCombatEvents();
 

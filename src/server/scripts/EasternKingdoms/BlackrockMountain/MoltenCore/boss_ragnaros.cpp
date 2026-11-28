@@ -193,9 +193,9 @@ struct boss_ragnaros : public BossAI
             HandleEmerge();
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.SetPhase(PHASE_EMERGED);
         ScheduleCombatEvents();
     }

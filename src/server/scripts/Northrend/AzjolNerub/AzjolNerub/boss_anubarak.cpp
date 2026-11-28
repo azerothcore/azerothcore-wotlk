@@ -306,7 +306,7 @@ struct boss_anub_arak : public BossAI
         switch (events.ExecuteEvent())
         {
             case EVENT_CLOSE_DOORS:
-                BossAI::_JustEngagedWith();
+                BossAI::_JustEngagedWith(nullptr);
                 break;
             case EVENT_CARRION_BEETLES:
                 DoCastSelf(SPELL_CARRION_BEETLES);

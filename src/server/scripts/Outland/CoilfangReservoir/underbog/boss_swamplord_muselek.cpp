@@ -91,9 +91,9 @@ struct boss_swamplord_muselek : public BossAI
         return true;
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
         scheduler.Schedule(3s, [this](TaskContext context)

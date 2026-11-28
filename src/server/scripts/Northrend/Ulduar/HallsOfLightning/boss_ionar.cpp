@@ -90,9 +90,9 @@ struct boss_ionar : public BossAI
         events.RescheduleEvent(EVENT_STATIC_OVERLOAD, 6s, 12s, 0, 1);
     }
 
-    void JustEngagedWith(Unit*) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
         ScheduleEvents(false);
     }

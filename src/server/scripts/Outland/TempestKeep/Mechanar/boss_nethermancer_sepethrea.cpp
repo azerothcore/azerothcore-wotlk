@@ -51,9 +51,9 @@ struct boss_nethermancer_sepethrea : public BossAI
 {
     boss_nethermancer_sepethrea(Creature* creature) : BossAI(creature, DATA_NETHERMANCER_SEPRETHREA) { }
 
-    void JustEngagedWith(Unit*  /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         scheduler.Schedule(6s, [this](TaskContext context)
         {

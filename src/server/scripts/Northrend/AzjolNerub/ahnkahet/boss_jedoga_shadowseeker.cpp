@@ -321,9 +321,9 @@ struct boss_jedoga_shadowseeker : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
         ReschedulleCombatEvents();
 

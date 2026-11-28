@@ -45,9 +45,9 @@ struct boss_shazzrah : public BossAI
 {
     boss_shazzrah(Creature* creature) : BossAI(creature, DATA_SHAZZRAH) {}
 
-    void JustEngagedWith(Unit* /*target*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 2s, 4s);
         events.ScheduleEvent(EVENT_SHAZZRAH_CURSE, 7s,11s);
         events.ScheduleEvent(EVENT_MAGIC_GROUNDING, 14s, 19s);

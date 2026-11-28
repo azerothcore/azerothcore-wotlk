@@ -44,9 +44,9 @@ struct boss_gahzranka : public BossAI
         me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         me->AddAura(SPELL_THRASH, me);
 
         ScheduleTimedEvent(8s, [&]

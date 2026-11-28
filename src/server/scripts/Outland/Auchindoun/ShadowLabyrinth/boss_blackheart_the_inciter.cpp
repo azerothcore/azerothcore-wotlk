@@ -70,10 +70,10 @@ struct boss_blackheart_the_inciter : public BossAI
         _JustDied();
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_AGGRO);
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         me->CallForHelp(100.0f);
         scheduler.Schedule(24s, [this](TaskContext context)
         {
