@@ -1,0 +1,24 @@
+# for use in the ac-database docker container
+# link as a ro file in /etc/mysql/conf.d/
+
+#
+# this version should perform better than then defaults
+# but won't stress low end systems that can run the current image
+#
+# derived from suggestions for mod-playerbots.
+#
+
+[mysqld]
+# 
+# should perform as well or better than then defaults
+# without demanding more resources than the current defaults
+# lightweight version of the suggestions from mod-playerbots.
+# 
+skip-log-bin                    
+innodb_buffer_pool_size = 2G    # 2G is reasonable for a typical single player server.   Up to 50% of total ram in the host system can improve performance in some cases if you can spare it.
+innodb_io_capacity = 500
+innodb_io_capacity_max = 2500
+innodb_use_fdatasync = ON
+innodb_buffer_pool_instances = 12
+innodb_log_buffer_size = 32M
+transaction_isolation = READ-COMMITTED
