@@ -315,7 +315,8 @@ void BattlefieldWG::OnBattleStart()
     });
 
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
-        ChatHandler(nullptr).SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE);
+        ChatHandler(nullptr).SendWorldTextOptional(BATTLEFIELD_WG_WORLD_START_MESSAGE,
+            ANNOUNCER_FLAG_DISABLE_PVP_START);
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
