@@ -3532,9 +3532,7 @@ public:
     {
         if (enableArg && *enableArg && !sPacketLog->CanLogPacket())
         {
-            handler->SendErrorMessage(
-                "Packet logging is unavailable: PacketLogFile is empty or cannot be opened. "
-                "Check worldserver.conf and restart the worldserver.");
+            handler->SendErrorMessage(LANG_PACKETLOG_UNAVAILABLE);
             return false;
         }
 
