@@ -102,4 +102,49 @@ TEST_F(VehiclePlayerBoardingTest, RemovingDisabledKitLeavesFlagCleared)
     EXPECT_FALSE(player->HasNpcFlag(UNIT_NPC_FLAG_PLAYER_VEHICLE));
 }
 
+// B1: detaching the passengers leaves the player a vehicle, kit and flags included.
+TEST_F(VehiclePlayerBoardingTest, DetachingAccessoriesKeepsTheKitAndFlags)
+{
+    TestPlayer* player = CreatePlayerWithVehicleKit();
+    ASSERT_NE(player->GetVehicleKit(), nullptr);
+
+    player->GetVehicleKit()->DetachAccessories();
+
+    EXPECT_NE(player->GetVehicleKit(), nullptr);
+    EXPECT_TRUE(player->HasUnitTypeMask(UNIT_MASK_VEHICLE));
+    EXPECT_TRUE(player->HasNpcFlag(UNIT_NPC_FLAG_PLAYER_VEHICLE));
+    EXPECT_TRUE(player->GetVehicleKit()->HasDetachedAccessories());
+
+    player->RemoveVehicleKit();
+}
+
+// A1/A2: a restore consumes the record it was given and leaves the kit alone.
+TEST_F(VehiclePlayerBoardingTest, RestoringDetachedAccessoriesClearsTheDetachedState)
+{
+    TestPlayer* player = CreatePlayerWithVehicleKit();
+    ASSERT_NE(player->GetVehicleKit(), nullptr);
+
+    player->GetVehicleKit()->DetachAccessories();
+    player->GetVehicleKit()->RestoreAccessories();
+
+    EXPECT_FALSE(player->GetVehicleKit()->HasDetachedAccessories());
+    EXPECT_NE(player->GetVehicleKit(), nullptr);
+
+    player->RemoveVehicleKit();
+}
+
+// The explicit teardown other player paths rely on still clears the kit after a detach.
+TEST_F(VehiclePlayerBoardingTest, RemovingADetachedKitStillTearsItDown)
+{
+    TestPlayer* player = CreatePlayerWithVehicleKit();
+    ASSERT_NE(player->GetVehicleKit(), nullptr);
+
+    player->GetVehicleKit()->DetachAccessories();
+    player->RemoveVehicleKit();
+
+    EXPECT_EQ(player->GetVehicleKit(), nullptr);
+    EXPECT_FALSE(player->HasUnitTypeMask(UNIT_MASK_VEHICLE));
+    EXPECT_FALSE(player->HasNpcFlag(UNIT_NPC_FLAG_PLAYER_VEHICLE));
+}
+
 } // namespace

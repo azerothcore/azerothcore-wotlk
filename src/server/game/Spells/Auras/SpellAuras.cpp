@@ -2140,8 +2140,12 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         // xinef: allow direct auras to stack if there is no passenger in this slot
         if (AuraEffect* aurEff = GetEffect(VehicleAura1 - 1))
             if (aurEff->GetAmount() > 0)
-                if (!veh->GetPassenger(aurEff->GetAmount() - 1))
+            {
+                // A slot that already seats the caster is that passenger's own: this aura re-states it.
+                Unit* seated = veh->GetPassenger(aurEff->GetAmount() - 1);
+                if (!seated || seated->GetGUID() == GetCasterGUID())
                     return true;
+            }
 
         if (!veh->GetAvailableSeatCount())
             return false;   // No empty seat available

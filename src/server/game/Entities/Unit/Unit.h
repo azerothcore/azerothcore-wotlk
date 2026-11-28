@@ -1944,6 +1944,8 @@ public:
 
     void EnterVehicle(Unit* base, int8 seatId = -1);
     void EnterVehicleUnattackable(Unit* base, int8 seatId = -1);
+    // Seats a passenger before it enters a map, so its create block already carries the seat.
+    void EnterVehicleBeforeCreate(Vehicle* vehicle, int8 seatId);
     void ExitVehicle(Position const* exitPosition = nullptr);
     void ChangeSeat(int8 seatId, bool next = true);
 
