@@ -15203,7 +15203,14 @@ bool Unit::IsAttackSpeedOverridenShapeShift() const
 void Unit::JumpTo(float speedXY, float speedZ, bool forward)
 {
     float angle = forward ? 0 : M_PI;
-    if (IsCreature())
+    // A creature a player drives (vehicle, possession) is moved by that client: a server jump spline on it can leave
+    // it under the map, so let KnockbackFrom hand the jump to the client, away from a point behind it
+    if (IsCreature() && IsClientControlled())
+    {
+        float orientation = angle + GetOrientation();
+        KnockbackFrom(GetPositionX() - std::cos(orientation), GetPositionY() - std::sin(orientation), speedXY, speedZ);
+    }
+    else if (IsCreature())
         GetMotionMaster()->MoveJumpTo(angle, speedXY, speedZ);
     else
     {
