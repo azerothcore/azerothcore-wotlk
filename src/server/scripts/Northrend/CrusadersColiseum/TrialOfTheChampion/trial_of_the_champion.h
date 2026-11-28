@@ -319,7 +319,7 @@ enum BlackKnightActions
 enum SharedSpells
 {
     SPELL_TRAMPLE_AURA                              = 67865, // also cast by the instance on the mounted champions
-    SPELL_GRAND_CHAMPIONS_CREDIT                    = 68572, // credit marker, cast once when the champions are defeated
+    SPELL_GRAND_CHAMPIONS_CREDIT                    = 68572, // credit marker, cast when the champions are defeated
     // Death's Respite, applied to the announcer during the Black Knight scene
     SPELL_DEATH_RESPITE_ANNOUNCER                   = 68306,
 };
