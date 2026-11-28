@@ -41,6 +41,7 @@ void PetitionMgr::LoadPetitions()
 {
     uint32 oldMSTime = getMSTime();
     PetitionStore.clear();
+    SignatureStore.clear();
     PetitionIdToItemGuid.clear();
 
     QueryResult result = CharacterDatabase.Query("SELECT ownerguid, petitionguid, name, type, petition_id FROM petition");
@@ -77,7 +78,6 @@ void PetitionMgr::LoadPetitions()
 void PetitionMgr::LoadSignatures()
 {
     uint32 oldMSTime = getMSTime();
-    SignatureStore.clear();
 
     QueryResult result = CharacterDatabase.Query("SELECT petition_id, playerguid, player_account FROM petition_sign");
     if (!result)
